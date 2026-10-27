@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Super Quiz dla Oli ✨</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(135deg, #0d0826 0%, #2a0845 35%, #64147d 70%, #ff2a85 100%);
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      overflow-x: hidden;
+      color: #ffffff;
+    }
+
+    html {
+      height: -webkit-fill-available;
+    }
+
+    h1, h2, h3, .font-heading {
+      font-family: 'Fredoka', cursive;
+    }
+
+    /* Glam Glitter Background Animation */
+    .glitter-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, #ffd700, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #ff007f, rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 50px 160px, #00f0ff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 130px 80px, #ff00d0, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #00ffaa, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      animation: glitterSparkle 4s linear infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes glitterSparkle {
+      0% { transform: translateY(0) scale(1); opacity: 0.5; }
+      50% { opacity: 0.8; transform: translateY(-10px) scale(1.02); }
+      100% { transform: translateY(0) scale(1); opacity: 0.5; }
+    }
+
+    /* Shiny Disco Glass Card */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    /* Disco Glow Buttons */
+    .btn-option {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(8px);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-option:active {
+      transform: scale(0.97);
+    }
+
+    .btn-option.correct {
+      background: linear-gradient(135deg, #00b09b, #96c93d) !important;
+      border-color: #00ffaa !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 25px rgba(0, 255, 170, 0.6);
+      animation: pulseGlow 0.6s ease infinite alternate;
+    }
+
+    .btn-option.wrong {
+      background: linear-gradient(135deg, #ff416c, #ff4b2b) !important;
+      border-color: #ff2a85 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 20px rgba(255, 42, 133, 0.6);
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    @keyframes pulseGlow {
+      from { transform: scale(1); }
+      to { transform: scale(1.02); }
+    }
+
+    .btn-sparkle {
+      background: linear-gradient(135deg, #ff007f 0%, #7928ca 50%, #4338ca 100%);
+      box-shadow: 0 8px 25px rgba(255, 0, 127, 0.5), inset 0 2px 2px rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    .btn-sparkle:hover, .btn-sparkle:active {
+      box-shadow: 0 12px 30px rgba(255, 0, 127, 0.8), inset 0 2px 4px rgba(255,255,255,0.8);
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    /* Sequin Badge */
+    .badge-sequin {
+      background: linear-gradient(135deg, #ffe066, #f59f00);
+      color: #3b1000;
+      box-shadow: 0 4px 15px rgba(245, 159, 0, 0.5);
+    }
+
+    /* Progress Bar Glow */
+    .progress-fill {
+      background: linear-gradient(90deg, #ff007f, #00f0ff, #ffe066);
+      background-size: 200% 100%;
+      animation: gradientShift 2s linear infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-between min-h-screen p-4 sm:p-6 relative">
+
+  <!-- Glitter overlay effect -->
+  <div class="glitter-bg"></div>
+
+  <!-- Main Container -->
+  <div class="w-full max-w-lg my-auto relative z-10 flex flex-col items-center">
+
+    <!-- Header / Logo -->
+    <div class="text-center mb-4 sm:mb-6">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full badge-sequin text-xs sm:text-sm font-bold tracking-wider uppercase mb-2">
+        ✨ Wyjątkowy Quiz dla Oli ✨
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-yellow-200 to-cyan-300 drop-shadow-md">
+        DISCO QUIZ OLI 🪩
+      </h1>
+    </div>
+
+    <!-- WELCOME SCREEN -->
+    <div id="welcome-screen" class="w-full glass-card rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center gap-6 transition-all duration-500">
+      <div class="relative">
+        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-1 shadow-2xl animate-pulse">
+          <div class="w-full h-full bg-slate-900/80 rounded-full flex items-center justify-center text-4xl sm:text-5xl">
+            👑
+          </div>
+        </div>
+        <span class="absolute -bottom-2 -right-2 bg-yellow-400 text-slate-900 text-xl p-2 rounded-full shadow-lg">✨</span>
+      </div>
+
+      <div class="space-y-3">
+        <h2 class="text-2xl sm:text-3xl font-bold text-white">Cześć Ola! 👋</h2>
+        <p class="text-pink-100 text-sm sm:text-base leading-relaxed">
+          Przygotowałem dla Ciebie lśniący, kolorowy quiz sprawdzający wiedzę z Twoich 3 super prezentacji! 💖
+        </p>
+      </div>
+
+      <!-- Presentation categories summary -->
+      <div class="w-full space-y-2 text-left text-xs sm:text-sm bg-black/20 p-4 rounded-2xl border border-white/10">
+        <div class="flex items-center gap-2 text-pink-300 font-semibold">
+          <span>⚽</span> 1. Ciekawostki Sportowe (6 pytań)
+        </div>
+        <div class="flex items-center gap-2 text-cyan-300 font-semibold">
+          <span>🇩🇰</span> 2. Ola w Vejle - Przewodnik po Danii (6 pytań)
+        </div>
+        <div class="flex items-center gap-2 text-yellow-300 font-semibold">
+          <span>🚫</span> 3. Najdziwniejsze Zakazy Świata (6 pytań)
+        </div>
+      </div>
+
+      <div class="w-full space-y-3 pt-2">
+        <button id="start-btn" onclick="startQuiz()" class="w-full py-4 rounded-2xl font-bold text-lg sm:text-xl text-white btn-sparkle cursor-pointer active:scale-95 transition-transform flex items-center justify-center gap-2">
+          <span>ROZPOCZNIJ QUIZ</span> ✨
+        </button>
+        <p class="text-xs text-pink-200/70">Do wygrania buziaki, gotówka i tytuł Mistrzyni Quizów! 🏆</p>
+      </div>
+    </div>
+
+    <!-- QUIZ CARD -->
+    <div id="quiz-card" class="w-full glass-card rounded-3xl p-5 sm:p-7 hidden flex-col gap-5 transition-all duration-300">
+      
+      <!-- Top info bar -->
+      <div class="flex items-center justify-between text-xs sm:text-sm font-semibold text-pink-200">
+        <span id="category-badge" class="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-cyan-300">
+          Kategoria
+        </span>
+        <span id="question-tracker" class="bg-black/30 px-3 py-1 rounded-full border border-white/10">
+          Pytanie <strong class="text-yellow-300">1</strong> / 18
+        </span>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="w-full bg-black/40 h-3 rounded-full overflow-hidden p-0.5 border border-white/10">
+        <div id="progress-bar" class="h-full rounded-full progress-fill transition-all duration-500 w-0"></div>
+      </div>
+
+      <!-- Question Text -->
+      <div class="py-2">
+        <h3 id="question-text" class="text-lg sm:text-xl font-bold text-white leading-snug">
+          Ładowanie pytania...
+        </h3>
+      </div>
+
+      <!-- Options Grid -->
+      <div id="options-container" class="flex flex-col gap-3">
+        <!-- Buttons injected dynamically -->
+      </div>
+
+      <!-- Instant Feedback Banner -->
+      <div id="feedback-banner" class="opacity-0 transition-opacity duration-300 min-h-[44px] flex items-center justify-center text-center p-2 rounded-xl text-sm font-bold">
+        <span id="feedback-text"></span>
+      </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="results-screen" class="w-full glass-card rounded-3xl p-6 sm:p-8 text-center hidden flex-col items-center gap-6">
+      
+      <div class="text-5xl sm:text-6xl animate-bounce">
+        🏆
+      </div>
+
+      <div class="space-y-2">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-pink-300 to-cyan-300">
+          GRATULACJE OLA!
+        </h2>
+        <p class="text-pink-100 text-sm sm:text-base">Ukończyłaś cały Disco Quiz!</p>
+      </div>
+
+      <!-- Score Box -->
+      <div class="w-full bg-black/30 p-5 rounded-2xl border border-white/15 flex flex-col items-center gap-2">
+        <span class="text-xs uppercase tracking-wider text-pink-300">Twój wynik końcowy</span>
+        <div class="text-4xl sm:text-5xl font-black text-yellow-300 font-heading">
+          <span id="final-score">0</span> / 18
+        </div>
+        <p id="score-comment" class="text-xs sm:text-sm text-cyan-200 font-medium italic mt-1">
+          Komentarz do wyniku...
+        </p>
+      </div>
+
+      <!-- Earned Rewards Section -->
+      <div class="w-full space-y-3 text-left">
+        <h3 class="text-sm font-bold text-yellow-300 uppercase tracking-wider text-center">
+          🎁 Twoje Wygrane Nagrody z Prezentacji:
+        </h3>
+        
+        <div class="bg-white/10 p-4 rounded-2xl border border-white/20 space-y-2 text-xs sm:text-sm">
+          <div id="reward-sport" class="flex items-center justify-between border-b border-white/10 pb-2">
+            <span>⚽ Sekcja Sportowa:</span>
+            <strong class="text-emerald-300">4,70 zł PLN</strong>
+          </div>
+          <div id="reward-vejle" class="flex items-center justify-between border-b border-white/10 pb-2">
+            <span>🇩🇰 Sekcja Vejle:</span>
+            <strong class="text-emerald-300">2,79 zł + Twoje życzenie!</strong>
+          </div>
+          <div id="reward-zakazy" class="flex items-center justify-between">
+            <span>🚫 Sekcja Zakazów:</span>
+            <strong class="text-pink-300">2,27 zł + 2 Buziaki! 😘😘</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Restart Button -->
+      <button onclick="resetQuiz()" class="w-full py-4 rounded-2xl font-bold text-lg text-white btn-sparkle cursor-pointer active:scale-95 transition-transform flex items-center justify-center gap-2">
+        <span>ZAGRAJ JESZCZE RAZ</span> 🔄
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-6 text-center text-xs text-pink-200/60 relative z-10">
+    Stworzone specjalnie dla Oli 💖 Disco & Glam Edition
+  </footer>
+
+  <script>
+    // Audio synthesis for fun web sounds without external files
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3); // A5
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+        osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.3); // A2
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      }
+    }
+
+    // 18 Questions dataset from 3 PDFs
+    const quizData = [
+      // SEKCJA 1: Ciekawostki Sportowe
+      {
+        category: "⚽ Ciekawostki Sportowe",
+        question: "1. Jakiego koloru były pierwsze piłeczki tenisowe na Turnieju Wielkoszlemowym (Wimbledon)?",
+        options: ["Żółte", "Białe", "Czerwone", "Zielone"],
+        correct: 1,
+        explanation: "Wcześniej grano białymi! Żółte wprowadzono dopiero w 1986 r., aby były lepiej widoczne w telewizji."
+      },
+      {
+        category: "⚽ Ciekawostki Sportowe",
+        question: "2. Dlaczego Etiopczyk Abebe Bikila przebiegł olimpijski maraton w Rzymie (1960) całkowicie boso?",
+        options: [
+          "Taka była tradycja w jego wiosce",
+          "Zgubił buty przed samym startem",
+          "Buty od sponsora go obcierały",
+          "Chciał pobić rekord w biegu boso"
+        ],
+        correct: 2,
+        explanation: "Bikila zdobył złoty medal, biegnąc boso, bo nowe buty dostarczone przez sponsora były niewygodne!"
+      },
+      {
+        category: "⚽ Ciekawostki Sportowe",
+        question: "3. Skąd brytyjski sędzia wziął pomysł na żółte i czerwone kartki w piłce nożnej?",
+        options: [
+          "Patrząc na sygnalizację świetlną na skrzyżowaniu",
+          "Z gry w karty z przyjaciółmi",
+          "Podpatrzył to w brytyjskim metrze",
+          "Z flag ostrzegawczych na plaży"
+        ],
+        correct: 0,
+        explanation: "Sędzia stał na skrzyżowaniu i patrząc na światła wymyślił prosty system kar! Kartki zadebiutowały w 1970 r."
+      },
+      {
+        category: "⚽ Ciekawostki Sportowe",
+        question: "4. W którym roku astronauta Alan Shepard uderzył dwie piłeczki golfowe na Księżycu?",
+        options: ["1965", "1969", "1971", "1980"],
+        correct: 2,
+        explanation: "W 1971 roku! Golf to jeden z zaledwie dwóch sportów uprawianych na Księżycu (drugim był rzut oszczepem)."
+      },
+      {
+        category: "⚽ Ciekawostki Sportowe",
+        question: "5. Z czego w ponad 92% składają się złote medale olimpijskie od 1912 roku?",
+        options: ["Z czystego złota", "Ze srebra", "Z miedzi", "Z mosiądzu"],
+        correct: 1,
+        explanation: "Od 1912 roku medale są głównie ze srebra (ponad 92%) i tylko pokryte cienką warstwą prawdziwego złota!"
+      },
+      {
+        category: "⚽ Ciekawostki Sportowe",
+        question: "6. Jaki jest najstarszy znany sport na świecie, przedstawiany na malowidłach sprzed ponad 15 000 lat?",
+        options: ["Zapasy", "Biegi maratońskie", "Łucznictwo", "Rzut dyskiem"],
+        correct: 0,
+        explanation: "Zapasy! Malowidła naskalne przedstawiające zapaśników datuje się na ponad 15 000 lat."
+      },
+
+      // SEKCJA 2: Ola w Vejle - Przewodnik po Danii
+      {
+        category: "🇩🇰 Przewodnik po Danii",
+        question: "7. Jaka była 'Liczba do zapamiętania' w prezentacji o Vejle?",
+        options: ["1986", "2106", "7429", "1219"],
+        correct: 1,
+        explanation: "Super! Liczba z prezentacji o Vejle to dokładnie 2106! 🎯"
+      },
+      {
+        category: "🇩🇰 Przewodnik po Danii",
+        question: "8. Jakie było 'Słowo do zapamiętania' w sekcji o duńskich nawykach?",
+        options: ["kartka", "świeczka", "klepsydra", "rower"],
+        correct: 2,
+        explanation: "Zgadza się! Słowo do zapamiętania w tej sekcji to 'klepsydra'! ⏳"
+      },
+      {
+        category: "🇩🇰 Przewodnik po Danii",
+        question: "9. Dlaczego budowa słynnego budynków Bølgen (Fala) w Vejle trwała tak długo?",
+        options: [
+          "Brakowało odpowiednich cegieł w całej Danii",
+          "Deweloper zbankrutował przez kryzys finansowy",
+          "Mieszkańcy protestowali przeciwko budowie",
+          "Architekt zmienił projekt w połowie prac"
+        ],
+        correct: 1,
+        explanation: "Po wybudowaniu 2 fal deweloper zbankrutował przez kryzys i budowa stała rozgrzebana przez prawie 10 lat!"
+      },
+      {
+        category: "🇩🇰 Przewodnik po Danii",
+        question: "10. Do czego Duńczycy wykorzystują swoją flagę (Dannebrog) w bardzo wyjątkowy sposób?",
+        options: [
+          "Do dekorowania domów, stołów i wbijania w tort z okazji urodzin",
+          "Zasłaniają nią okna zamiast rolet",
+          "Mchają nią na przejściach dla pieszych",
+          "Używają jej tylko podczas meczów reprezentacji"
+        ],
+        correct: 0,
+        explanation: "W Danii flaga towarzyszy świętowaniu urodzin – obklejają nią cały dom i wbijają mini-flagi w tort!"
+      },
+      {
+        category: "🇩🇰 Przewodnik po Danii",
+        question: "11. Ile kg wosku rocznie na osobę zużywają Duńczycy na świece w ramach hygge?",
+        options: ["Około 2 kg", "Około 6 kg", "Około 10 kg", "Około 15 kg"],
+        correct: 1,
+        explanation: "Duńczycy zużywają najwięcej świec w Europie – aż około 6 kg wosku rocznie na głowę!"
+      },
+      {
+        category: "🇩🇰 Przewodnik po Danii",
+        question: "12. Co jest wyjątkowego w duńskiej fladze państwowej (Dannebrog)?",
+        options: [
+          "Została zaprojektowana przez dzieci",
+          "Zmienia kolory w zależności od pory roku",
+          "Jest uznawana za najstarszą ciągle używaną flagę państwową na świecie",
+          "Ma najwięcej gwiazdek ze wszystkich flag"
+        ],
+        correct: 2,
+        explanation: "Dannebrog to oficjalnie najstarsza ciągle używana flaga na świecie – jest używana od XIII wieku!"
+      },
+
+      // SEKCJA 3: Najdziwniejsze Zakazy Świata
+      {
+        category: "🚫 Najdziwniejsze Zakazy",
+        question: "13. Jaka była 'Liczba do zapamiętania' w przewodniku po zakazach?",
+        options: ["7429", "2106", "1970", "1514"],
+        correct: 0,
+        explanation: "Brawo! Tajemnicza liczba w tej prezentacji to 7429! 🔢"
+      },
+      {
+        category: "🚫 Najdziwniejsze Zakazy",
+        question: "14. Jakie było 'Słowo do zapamiętania' na samym początku prezentacji o zakazach?",
+        options: ["klepsydra", "kartka", "szpilka", "guma"],
+        correct: 1,
+        explanation: "Świetnie! Słowo do zapamiętania na slajdzie startowym to 'kartka'! 📝"
+      },
+      {
+        category: "🚫 Najdziwniejsze Zakazy",
+        question: "15. Dlaczego w Singapurze wprowadzono zakaz żucia i sprzedaży gumy?",
+        options: [
+          "Żucie gumy psuło zęby mieszkańców",
+          "Gumy przyklejane do czujników drzwi w metrze powodowały awarie",
+          "Guma była za droga w imporcie",
+          "Ptaki dusiły się wyrzuconymi gumami"
+        ],
+        correct: 1,
+        explanation: "Ludzie przyklejali gumy do czujników drzwi w nowym metrze, co powodowało awarie w całym mieście!"
+      },
+      {
+        category: "🚫 Najdziwniejsze Zakazy",
+        question: "16. Dlaczego w Malezji zakazano noszenia żółtych koszulek i dodatków?",
+        options: [
+          "Żółty był oficjalnym kolorem opozycji organizującej protesty",
+          "Przykładały one uwagą niebezpiecznych owadów",
+          "Król Malezji zastrzegł ten kolor tylko dla siebie",
+          "Żółty materiał był uznamy za łatwopalny"
+        ],
+        correct: 0,
+        explanation: "Żółty był kolorem opozycji protestującej przeciw rządowi – rząd uznał ten kolor za zagrożenie dla bezpieczeństwa!"
+      },
+      {
+        category: "🚫 Najdziwniejsze Zakazy",
+        question: "17. Co dzieje się z ciężko chorymi lub starszymi osobami na Svalbardzie (zakaz umierania)?",
+        options: [
+          "Muszą podpisać specjalną zgodę na burial",
+          "Są transportowani na stały ląd do Norwegii",
+          "Są chowani na specjalnym statku na morzu",
+          "Dostają specjalną opiekę w arktycznym szpitalu"
+        ],
+        correct: 1,
+        explanation: "Przez wieczną zmarzlinę ciała na cmentarzu się nie rozkładają, dlatego chorych wywozi się do Norwegii!"
+      },
+      {
+        category: "🚫 Najdziwniejsze Zakazy",
+        question: "18. Czego nie wolno nosić przy starych zabytkach w Grecji (np. na Akropolu)?",
+        options: [
+          "Czapek z daszkiem",
+          "Okularów przeciwsłonecznych",
+          "Butów na wysokim obcasie (szpilek)",
+          "Jaskrawych ubrań"
+        ],
+        correct: 2,
+        explanation: "Szpilki działają na tysiącletni marmur jak dłuto kamieniarskie i niszczą historyczne podłoże!"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let canAnswer = true;
+
+    function startQuiz() {
+      playSound('click');
+      document.getElementById('welcome-screen').classList.add('hidden');
+      document.getElementById('quiz-card').classList.remove('hidden');
+      document.getElementById('quiz-card').classList.add('flex');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      canAnswer = true;
+      const data = quizData[currentQuestion];
+
+      // Update Header & Progress
+      document.getElementById('category-badge').textContent = data.category;
+      document.getElementById('question-tracker').innerHTML = `Pytanie <strong class="text-yellow-300">${currentQuestion + 1}</strong> / ${quizData.length}`;
+      
+      const progressPercent = ((currentQuestion) / quizData.length) * 100;
+      document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+      // Update Question
+      document.getElementById('question-text').textContent = data.question;
+
+      // Reset Feedback
+      const feedbackBanner = document.getElementById('feedback-banner');
+      feedbackBanner.className = 'opacity-0 transition-opacity duration-300 min-h-[44px] flex items-center justify-center text-center p-2 rounded-xl text-sm font-bold';
+      document.getElementById('feedback-text').textContent = '';
+
+      // Options
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+
+      data.options.forEach((optText, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-option w-full py-3.5 px-4 rounded-2xl text-left font-semibold text-sm sm:text-base text-white flex items-center justify-between cursor-pointer';
+        btn.innerHTML = `
+          <span>${optText}</span>
+          <span class="w-6 h-6 rounded-full border border-white/30 flex items-center justify-center text-xs opacity-70">
+            ${String.fromCharCode(65 + index)}
+          </span>
+        `;
+        btn.onclick = () => selectOption(index, btn);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function selectOption(selectedIndex, selectedBtn) {
+      if (!canAnswer) return;
+      canAnswer = false;
+
+      const data = quizData[currentQuestion];
+      const allButtons = document.querySelectorAll('.btn-option');
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const feedbackText = document.getElementById('feedback-text');
+
+      if (selectedIndex === data.correct) {
+        score++;
+        playSound('correct');
+        selectedBtn.classList.add('correct');
+        
+        feedbackBanner.className = 'opacity-100 bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 transition-opacity duration-300 p-2.5 rounded-xl text-xs sm:text-sm font-bold';
+        feedbackText.innerHTML = `✨ BRAWO OLA! krótka odpowiedź. ${data.explanation}`;
+
+        // Little sparkle effect
+        confetti({
+          particleCount: 25,
+          spread: 60,
+          origin: { y: 0.8 }
+        });
+
+      } else {
+        playSound('wrong');
+        selectedBtn.classList.add('wrong');
+        allButtons[data.correct].classList.add('correct');
+
+        feedbackBanner.className = 'opacity-100 bg-rose-500/20 border border-rose-400/40 text-rose-200 transition-opacity duration-300 p-2.5 rounded-xl text-xs sm:text-sm font-bold';
+        feedbackText.innerHTML = `Ops! Prawidłowa to: ${data.options[data.correct]}. <br><span class="font-normal opacity-90">${data.explanation}</span>`;
+      }
+
+      // Next Question Delay
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+          loadQuestion();
+        } else {
+          showResults();
+        }
+      }, 2400);
+    }
+
+    function showResults() {
+      document.getElementById('quiz-card').classList.add('hidden');
+      document.getElementById('quiz-card').classList.remove('flex');
+      
+      const resultsScreen = document.getElementById('results-screen');
+      resultsScreen.classList.remove('hidden');
+      resultsScreen.classList.add('flex');
+
+      document.getElementById('final-score').textContent = score;
+
+      // Personalized comment
+      const commentEl = document.getElementById('score-comment');
+      if (score === 18) {
+        commentEl.textContent = "PERFEKCYJNIE! Ola, jesteś absolutną Mistrzynią Quizów! 👑✨";
+      } else if (score >= 14) {
+        commentEl.textContent = "Niesamowity wynik! Prawie bezbłędnie, brawo Ola! 💖🎉";
+      } else if (score >= 10) {
+        commentEl.textContent = "Super wynik! Bardzo ładnie pamiętasz szczegóły z prezentacji! 👍⭐";
+      } else {
+        commentEl.textContent = "Dobry wynik! Liczy się świetna zabawa i zdobyte nagrody! 🎈";
+      }
+
+      // Grand celebration confetti
+      const duration = 3 * 1000;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#ff007f', '#00f0ff', '#ffe066']
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#ff007f', '#00f0ff', '#ffe066']
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+    }
+
+    function resetQuiz() {
+      playSound('click');
+      currentQuestion = 0;
+      score = 0;
+      document.getElementById('results-screen').classList.add('hidden');
+      document.getElementById('results-screen').classList.remove('flex');
+      document.getElementById('quiz-card').classList.remove('hidden');
+      document.getElementById('quiz-card').classList.add('flex');
+      loadQuestion();
+    }
+  </script>
+</body>
+</html>
